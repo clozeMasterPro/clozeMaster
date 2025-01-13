@@ -8,7 +8,7 @@ ClozeMaster is a novel fuzzing tool that leverages large language models (LLMs) 
 Before using this tool, please ensure that the following development tools are installed on your computer:
 
 - python>=3.8
-- rustc (nightly)
+- rustc (1.73)
 
 You have to install all the libraries listed in `requirements.txt`
 
@@ -85,5 +85,16 @@ python main.py --model_path your_model_path \
 -->
 
 ## Docker Image
-You can download our Docker image tarball at [link](https://drive.google.com/drive/folders/1LQtEQmF2OaM1oU8fuqW9Fetv2nKDJ_Uv?usp=sharing). Our bug data is located in the `/home/cloze` folder. You can run the bug_analysis.py script to reproduce the experimental results.
+We highly recommend using Docker images to directly run our method framework, which can avoid the failure of reproduction due to issues like dependency packages.
+First, decompress the downloaded tar package into a local image. Then, start a container from the image. 
+```sh
+docker load -i cloze.tar
+docker run -it --net=host --gpus all --name cloze -e NVIDIA_DRIVER_CAPABILITIES=compute,utility -e NVIDIA_VISIBLE_DEVICES=all [image_name]:[tag]
+```
+Under the `/clozeMaster` directory, you can see all our project files and datasets. 
+Activate the py38 environment with conda, and run the main.py script under the `/clozeMaster` directory. You will be able to see the running logs under `./log` and the generated test code under `./target_data`.
+```sh
+conda activate py38
+python main.py
+```
 
