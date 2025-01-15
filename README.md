@@ -2,20 +2,23 @@
 Artifacts for "ClozeMaster: Fuzzing Rust Compiler by Harnessing LLMs for Infilling Masked Real Programs".
 ## Introduction
 ClozeMaster is a novel fuzzing tool that leverages large language models (LLMs) to generate effective test cases for Rust compilers. The key idea behind ClozeMaster is to identify the bracket structure of given code and use it to guide the generation of new test cases through masked token completion. 
-<br>This approach is very simple and easy to implement, and has achieved good practical application results in detecting defects in compilers of complex programming languages with limited training data (such as Rust). It is also easily transferable to the compilers of other relatively mature languages (such as C/C++).
+<br>
+This approach is very simple and easy to implement, and has achieved good practical application results in detecting defects in compilers of complex programming languages with limited training data (such as Rust). It is also easily transferable to the compilers of other relatively mature languages (such as C/C++).
 
 ## Install from Docker Image
 ![](https://camo.githubusercontent.com/01a2f5a54eeb55937da4855adcecdf816f84aedca15ddf624cdeea870e646377/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f5265636f6d6d656e6465642d5965732d627269676874677265656e)
 
 We highly recommend using Docker images to directly run our method framework, which can avoid the failure of reproduction due to issues like dependency packages.
+You can get the docker image from https://zenodo.org/records/14635854.</br>
 First, decompress the downloaded tar package into a local image. Then, start a container from the image. 
 ```sh
 docker load -i cloze.tar
 docker run -it --net=host --gpus all --name cloze -e NVIDIA_DRIVER_CAPABILITIES=compute,utility -e NVIDIA_VISIBLE_DEVICES=all [image_name]:[tag]
 ```
-Under the `/clozeMaster` directory, you can see all our project files and datasets. 
+Under the `/clozeMaster` directory in the container, you can see all our project files and datasets. 
 Activate the py38 environment with conda, and run the main.py script under the `/clozeMaster` directory. You will be able to see the running logs under `./log` and the generated test code under `./target_data`.
 ```sh
+cd /clozeMaster
 conda activate py38
 python main.py
 ```
