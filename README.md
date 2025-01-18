@@ -21,12 +21,33 @@ Additionally, ClozeMaster utilizes the [Incoder-1B](https://huggingface.co/faceb
 
 ## Usage
 
+## Overflow
+
 ```sh
+conda activate py38
 python main.py --model_path your_model_path \
 --tokenizer_path your_tokenizer_path \
 --rs_files your_rust_files_path \
 --csv_file path_which_you_want_to_log_the_bug_information \
 --log_file path_which_you_want_to_log_the_fuzzing_progress
+```
+or you can simply run `python main.py` and you can see the runtime output in ./log/*
+
+## Reproduction
+
+You can reproduce the process of how we use clozeMaster to generate a testcase to find a new bug on the rust compiler.
+```sh
+python reproduce.py --seedfile ./reproduce/116681\  # The default folder address for storing seed file
+--time 200 #  The maximum number of generations you want clozemaster to attempt
+```
+For the test cases that time out, you can use the following command to view its error message.
+```sh
+rustup default nightly
+rustc -Z time-passes ./reproduce/116681/reproduce_bug.rs
+```
+After that, you should change the rustc to stable version.
+```sh
+rustup default 1.73
 ```
 
 ## Bug found by our tool
@@ -84,6 +105,5 @@ python main.py --model_path your_model_path \
 [115173](https://gcc.gnu.org/bugzilla/show_bug.cgi?id=115173)  
 -->
 
-## Docker Image
-You can download our Docker image tarball at [link](https://drive.google.com/drive/folders/1LQtEQmF2OaM1oU8fuqW9Fetv2nKDJ_Uv?usp=sharing). Our bug data is located in the `/home/cloze` folder. You can run the bug_analysis.py script to reproduce the experimental results.
+
 

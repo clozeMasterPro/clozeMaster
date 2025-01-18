@@ -37,7 +37,7 @@ def compare_text(text1, text2):
 
 def compile_rust(filepath,rsfile,opt):
     cmd="rustc {} -C opt-level={}  --out-dir temp".format(rsfile,opt) #--out-dir temp
-    time_limit=180
+    time_limit=60 # stable is 180; while 60 make the reproduction faster
     p=subprocess.Popen(cmd,cwd=filepath, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True,text=True)
     try:
         out, err = p.communicate(timeout=time_limit)
@@ -76,20 +76,27 @@ def add_csv(filename,columns,new_line_list):
             writer.writerow(columns)
 
         writer.writerow(new_line_list)
-
+def ensure_file_path_exists(file_path):
+    directory = os.path.dirname(file_path)
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    else:
+        pass
 
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--model_path', type=str, default = "/path/to/your/model")#your model path
-    parser.add_argument('--tokenizer_path', type=str, default="/path/to/your/model")# #your tokenizer path
+    parser.add_argument('--model_path', type=str, default = "/clozeMaster/model/Incoder1b")#your model path
+    parser.add_argument('--tokenizer_path', type=str, default="/clozeMaster/model/Incoder1b")# #your tokenizer path
     
-    parser.add_argument('--rs_files', type=str, default = './dataset/')#your rust files path,default is the rust files path
+    parser.add_argument('--rs_files', type=str, default = './dataset/history_codes')#your rust files path,default is the rust files path
 
     parser.add_argument('--csv_file', type=str, default = './log/bug.csv')#your csv file path
     parser.add_argument('--log_file', type=str, default = './log/demo.log')#your log file path
+    parser.add_argument('--multi_opt',type=bool,default=False)# whether test with different opts
     args = parser.parse_args()
-    
+    ensure_file_path_exists(args.log_file)
+    ensure_file_path_exists(args.csv_file)
 
     logging.basicConfig(level=logging.INFO 
                     ,filename=args.log_file
@@ -109,13 +116,16 @@ if __name__=="__main__":
     csv_file = args.csv_file
 
     rs_files=get_rs_files(args.rs_files)
+    random.shuffle(rs_files)
     
     
     logging.info('============================\n rs_files num:{}\n=========================\n'.format(len(rs_files)))
-
+    bug_count=0
     for rs_file in tqdm(rs_files):
         with open(rs_file,'r',errors='ignore') as f:
             code = f.read()
+        if len(code)>500:
+            continue
         masked_codes = cloze_mask.mask_singel_code(code)
         cnt=0
         for masked_code in masked_codes:
@@ -130,10 +140,20 @@ if __name__=="__main__":
             with open(masked_file,'w') as f:
                 f.write(new_code)
 
-            for opt in opts:
+            if args.multi_opt:
+                for opt in opts:
+                    status,err=compile_rust(os.path.dirname(masked_file),newfilename,opt)
+                    err_info,stack_info=get_err(err)
+                    if status!="ok":
+                        bug_count+=1
+                        add_csv(csv_file,["filename","opt","status","err_info","stack_info"],[masked_file,opt,status,err_info,stack_info])
+                    logging.info('filename:{} opt:{} status:{} err_info:{} stack_info:{}'.format(newfilename,opt,status,err_info,stack_info))
+            else:
+                opt="0"
                 status,err=compile_rust(os.path.dirname(masked_file),newfilename,opt)
                 err_info,stack_info=get_err(err)
                 if status!="ok":
                     add_csv(csv_file,["filename","opt","status","err_info","stack_info"],[masked_file,opt,status,err_info,stack_info])
                 logging.info('filename:{} opt:{} status:{} err_info:{} stack_info:{}'.format(newfilename,opt,status,err_info,stack_info))
+
                 
