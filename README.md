@@ -11,7 +11,7 @@ This approach is very simple and easy to implement, and has achieved good practi
 We highly recommend using Docker images to directly run our method framework, which can avoid the failure of reproduction due to issues like dependency packages.
 ```sh
 docker pull clozemaster/cloze:v1.0
-docker run -it --net=host --gpus all --name cloze -e NVIDIA_DRIVER_CAPABILITIES=compute,utility -e NVIDIA_VISIBLE_DEVICES=all [image_name]:[tag]
+docker run -it --net=host --gpus all --name cloze -e NVIDIA_DRIVER_CAPABILITIES=compute,utility -e NVIDIA_VISIBLE_DEVICES=all clozemaster/cloze:v1.0
 ```
 Under the `/clozeMaster` directory in the container, you can see all our project files and datasets. 
 Activate the py38 environment with conda, and run the main.py script under the `/clozeMaster` directory. You will be able to see the running logs under `./log` and the generated test code under `./target_data`.
