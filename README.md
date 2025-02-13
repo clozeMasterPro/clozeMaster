@@ -57,9 +57,10 @@ or you can simply run `python main.py` and you can see the runtime output in ./l
 You can reproduce the process of how we use clozeMaster to generate a testcase to find a new bug on the rust compiler.
 ```sh
 mkdir temp
-python reproduce.py --seedfile ./reproduce/116681\  # The default folder address for storing seed file(seed.rs);and the reproduce output will be stored at ./reproduce/116681/reproduce_bug.rs
---time 200 #  The maximum number of generations you want clozemaster to attempt
+python reproduce.py --seedfile ./reproduce/116681 --time 200 
 ```
+- seedfile: The default folder address for storing seed file(seed.rs);and the reproduce output will be stored at `./reproduce/116681/reproduce_bug.rs`
+- time: The maximum number of generations you want clozemaster to attempt
 For the test cases that time out, you can use the following command to view its error message.
 ```sh
 rustup default nightly
